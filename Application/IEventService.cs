@@ -1,4 +1,5 @@
 ﻿using EventManager.Models;
+using EventManager.Models.DTO;
 
 namespace EventManager.Application
 {
@@ -6,8 +7,8 @@ namespace EventManager.Application
     {
         public Event? GetEvent(int id);
         public List<Event> GetAllEvents();
-        public Event CreateEvent(string title, string description, DateTime startAt, DateTime endAt);
-        public Event UpdateEvent();
+        public Event CreateEvent(EventDTO eventDTO);
+        public bool UpdateEvent(int id, EventDTO eventDTO);
         public bool DeleteEvent(int id);
         
     }

@@ -1,4 +1,5 @@
 ﻿using EventManager.Models;
+using EventManager.Models.DTO;
 
 namespace EventManager.Application
 {
@@ -16,25 +17,34 @@ namespace EventManager.Application
             return _events;
         }
 
-        public Event CreateEvent(string title, string description, DateTime startAt, DateTime endAt)
+        public Event CreateEvent(EventDTO eventDTO)
         {
             var id = _events.Any() ? _events.Max(a => a.Id) + 1 : 1;
             var createdEvent = new Event()
             {
                 Id = id,
-                Title = title,
-                Description = description,
-                StartAt = startAt,
-                EndAt = endAt
+                Title = eventDTO.Title,
+                Description = eventDTO.Description,
+                StartAt = eventDTO.StartAt,
+                EndAt = eventDTO.EndAt
             };
             _events.Add(createdEvent);
             return createdEvent;
         }
 
-        public Event UpdateEvent()
+        public bool UpdateEvent(int id, EventDTO eventDTO)
         {
-            throw new NotImplementedException();
+            var existingEvent = _events.FirstOrDefault(a => a.Id == id);
+            if (existingEvent == null)
+                return false;
+
+            existingEvent.Title = eventDTO.Title;
+            existingEvent.Description = eventDTO.Description;
+            existingEvent.StartAt = eventDTO.StartAt;
+            existingEvent.EndAt = eventDTO.EndAt;
+            return true;
         }
+
         public bool DeleteEvent(int id)
         {
             var existingEvent = _events.FirstOrDefault(a => a.Id == id);
