@@ -8,8 +8,8 @@ namespace EventManager.Application
         public Event? GetEvent(int id);
         public List<Event> GetAllEvents();
         public Event CreateEvent(EventDTO eventDTO);
-        public bool UpdateEvent(int id, EventDTO eventDTO);
-        public bool DeleteEvent(int id);
+        public bool TryUpdateEvent(int id, EventDTO eventDTO);
+        public bool TryDeleteEvent(int id);
         
     }
 }

@@ -43,7 +43,7 @@ namespace EventManager.Presentation.Controllers
         [HttpPut("{id}")]
         public IActionResult Put(int id, EventDTO eventDTO) 
         {
-            var result = _eventService.UpdateEvent(id, eventDTO);
+            var result = _eventService.TryUpdateEvent(id, eventDTO);
             return result ? NoContent() : NotFound($"Событие с ID = {id} не найдено");
         }
 
@@ -51,8 +51,8 @@ namespace EventManager.Presentation.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(int id) 
         {
-            var result = _eventService.DeleteEvent(id);
-            return result ? Ok(result) : NotFound($"Событие с ID = {id} не найдено");
+            var result = _eventService.TryDeleteEvent(id);
+            return result ? NoContent() : NotFound($"Событие с ID = {id} не найдено");
         }
         
     }
