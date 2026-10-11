@@ -19,6 +19,7 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();     // Разрешить любые заголовки в запросе
     });
 });
+builder.Services.AddProblemDetails();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

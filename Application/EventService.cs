@@ -5,21 +5,22 @@ namespace EventManager.Application
 {
     public class EventService : IEventService
     {
-        private List<Event> _events = new();
+        private Dictionary<int, Event> _events = [];
 
         public Event? GetEvent(int id)
         {
-            return _events.FirstOrDefault(a => a.Id == id);
+            _events.TryGetValue(id, out Event? currentEvent);
+            return currentEvent;
         }
 
         public List<Event> GetAllEvents()
         {
-            return _events;
+            return [.. _events.Values];
         }
 
         public Event CreateEvent(EventDTO eventDTO)
         {
-            var id = _events.Any() ? _events.Max(a => a.Id) + 1 : 1;
+            var id = _events.Count > 0 ? _events.Max(a => a.Key) + 1 : 1;
             var createdEvent = new Event()
             {
                 Id = id,
@@ -28,13 +29,13 @@ namespace EventManager.Application
                 StartAt = eventDTO.StartAt,
                 EndAt = eventDTO.EndAt
             };
-            _events.Add(createdEvent);
+            _events.Add(id, createdEvent);
             return createdEvent;
         }
 
-        public bool UpdateEvent(int id, EventDTO eventDTO)
+        public bool TryUpdateEvent(int id, EventDTO eventDTO)
         {
-            var existingEvent = _events.FirstOrDefault(a => a.Id == id);
+            var existingEvent = GetEvent(id);
             if (existingEvent == null)
                 return false;
 
@@ -45,12 +46,12 @@ namespace EventManager.Application
             return true;
         }
 
-        public bool DeleteEvent(int id)
+        public bool TryDeleteEvent(int id)
         {
-            var existingEvent = _events.FirstOrDefault(a => a.Id == id);
+            var existingEvent = GetEvent(id);
             if (existingEvent == null)
                 return false;
-            _events.Remove(existingEvent);
+            _events.Remove(id);
             return true;
         }
     }
