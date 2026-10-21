@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="../TestEventManager/TestEventManager.csproj" Id="1fdb22a7-db9d-4db2-8f63-b9f7cfc032f2" />
   <Project Path="EventManager.csproj" />
 </Solution>

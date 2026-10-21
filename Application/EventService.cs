@@ -1,26 +1,45 @@
-﻿using EventManager.Models;
+﻿using EventManager.Data;
+using EventManager.Models;
 using EventManager.Models.DTO;
+using System.Collections;
 
 namespace EventManager.Application
 {
     public class EventService : IEventService
     {
-        private Dictionary<int, Event> _events = [];
+        private readonly IEventRepository _repository;
+        public EventService(IEventRepository repository) 
+        {
+            _repository = repository;
+            
+        }
 
         public Event? GetEvent(int id)
         {
-            _events.TryGetValue(id, out Event? currentEvent);
-            return currentEvent;
+            return _repository.GetAll().FirstOrDefault(ev => ev.Id == id); 
         }
 
-        public List<Event> GetAllEvents()
+        public List<Event> GetAllEvents(string? title = null, DateTime? from = null, DateTime? to = null)
         {
-            return [.. _events.Values];
+            IEnumerable<Event> filtered = _repository.GetAll();
+            if (!string.IsNullOrEmpty(title))
+            {
+                title = title.ToLowerInvariant();
+                filtered = filtered.Where(ev => ev.Title.Contains(title, StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (from != null)
+                filtered = filtered.Where(ev => ev.StartAt >= from);
+
+            if(to != null)
+                filtered = filtered.Where(ev => ev.EndAt <= to);
+            return [.. filtered];
         }
 
         public Event CreateEvent(EventDTO eventDTO)
         {
-            var id = _events.Count > 0 ? _events.Max(a => a.Key) + 1 : 1;
+            var _events = _repository.GetAll();
+            var id = _events.Count() > 0 ? _events.Max(a => a.Id) + 1 : 1;
             var createdEvent = new Event()
             {
                 Id = id,
@@ -29,7 +48,7 @@ namespace EventManager.Application
                 StartAt = eventDTO.StartAt,
                 EndAt = eventDTO.EndAt
             };
-            _events.Add(id, createdEvent);
+            _repository.Add(createdEvent);
             return createdEvent;
         }
 
@@ -51,7 +70,7 @@ namespace EventManager.Application
             var existingEvent = GetEvent(id);
             if (existingEvent == null)
                 return false;
-            _events.Remove(id);
+            _repository.Remove(existingEvent);
             return true;
         }
     }

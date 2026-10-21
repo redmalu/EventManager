@@ -19,9 +19,9 @@ namespace EventManager.Presentation.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Event>> GetAll()
+        public ActionResult<List<Event>> GetAll(string? title, DateTime? from, DateTime? to)
         {
-            return Ok(_eventService.GetAllEvents());
+            return Ok(_eventService.GetAllEvents(title, from, to));
         }
 
         [HttpGet("{id}")]

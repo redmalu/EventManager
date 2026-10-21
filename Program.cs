@@ -1,4 +1,5 @@
 using EventManager.Application;
+using EventManager.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +10,8 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<IEventService, EventService>();
+builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<IEventRepository, MemoryEventRepository>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy => // Первым аргументом указывается название политики
@@ -29,6 +31,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthorization();
