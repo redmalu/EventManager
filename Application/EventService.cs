@@ -19,9 +19,10 @@ namespace EventManager.Application
             return _repository.GetAll().FirstOrDefault(ev => ev.Id == id); 
         }
 
-        public List<Event> GetAllEvents(string? title = null, DateTime? from = null, DateTime? to = null)
+        public PaginatedResult<Event> GetAllEvents(int page, int pageSize, string? title = null, DateTime? from = null, DateTime? to = null)
         {
             IEnumerable<Event> filtered = _repository.GetAll();
+
             if (!string.IsNullOrEmpty(title))
             {
                 title = title.ToLowerInvariant();
@@ -33,7 +34,16 @@ namespace EventManager.Application
 
             if(to != null)
                 filtered = filtered.Where(ev => ev.EndAt <= to);
-            return [.. filtered];
+
+            int totalCount = filtered.Count();            
+            return new PaginatedResult<Event>
+            {
+                Items = [.. filtered.Skip((page - 1) * pageSize).Take(pageSize)],
+                Page = page,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+            };
         }
 
         public Event CreateEvent(EventDTO eventDTO)

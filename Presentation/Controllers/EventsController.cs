@@ -19,9 +19,9 @@ namespace EventManager.Presentation.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Event>> GetAll(string? title, DateTime? from, DateTime? to)
+        public ActionResult<PaginatedResult<Event>> GetAll(string? title, DateTime? from, DateTime? to, int? page = 1, int? pageSize = 10)
         {
-            return Ok(_eventService.GetAllEvents(title, from, to));
+            return Ok(_eventService.GetAllEvents(page.Value, pageSize.Value, title, from, to));
         }
 
         [HttpGet("{id}")]
