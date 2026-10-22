@@ -88,3 +88,44 @@ EventManager/
   "endAt": "2024-11-15T18:00:00Z"
 }
 ```
+# Запуск тестов
+
+Проект содержит модульные тесты, написанные с использованием **xUnit** и **Moq**.
+
+## Требования
+
+- [.NET SDK 8.0+](https://dotnet.microsoft.com/download)
+- Перейдите в папку с тестовым проектом (например, `TestEventManager`)
+
+## Запуск всех тестов
+
+```bash
+dotnet test
+```
+
+## Запуск с подробным выводом
+
+```bash
+dotnet test --verbosity normal
+```
+
+Уровни детализации: `quiet`, `minimal`, `normal`, `detailed`, `diagnostic`.
+
+## Фильтрация тестов
+
+Тесты помечены трейтом `[Trait("Category", "...")]`. Это позволяет запускать только нужные группы:
+
+```bash
+# Только тесты удаления
+dotnet test --filter "Category=DeleteEvent"
+
+# Только тесты обновления
+dotnet test --filter "Category=UpdateEvent"
+
+# Объединение нескольких категорий (логическое ИЛИ)
+dotnet test --filter "Category=DeleteEvent|Category=UpdateEvent"
+
+# Полнотекстовый поиск по имени теста
+dotnet test --filter "FullyQualifiedName~TryDeleteEvent"
+```
+
