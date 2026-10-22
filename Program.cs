@@ -1,5 +1,6 @@
 using EventManager.Application;
 using EventManager.Data;
+using EventManager.Infrastructure.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");

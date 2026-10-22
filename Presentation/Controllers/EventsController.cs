@@ -21,7 +21,12 @@ namespace EventManager.Presentation.Controllers
         [HttpGet]
         public ActionResult<PaginatedResult<Event>> GetAll(string? title, DateTime? from, DateTime? to, int? page = 1, int? pageSize = 10)
         {
-            return Ok(_eventService.GetAllEvents(page.Value, pageSize.Value, title, from, to));
+            if (page < 1)
+                return BadRequest("Номер страницы не должен быть меньше 1");
+            else if ((pageSize < 5 || pageSize > 100))
+                return BadRequest("Размер страницы не должен быть меньше 5 и больше 100");
+            
+            return Ok(_eventService.GetAllEvents(page!.Value, pageSize!.Value, title, from, to));
         }
 
         [HttpGet("{id}")]
