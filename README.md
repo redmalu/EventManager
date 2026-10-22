@@ -57,7 +57,12 @@ EventManager/
    - `http://localhost:5112/swagger` или `https://localhost:5112/swagger`
 
 ## API Endpoints
- - GET '/api/events'- Получить список всех событий.
+ - GET '/api/events'- Получить отфильтрованный и пагинированный список всех событий.
+	- title string Фильтр по названию (case-insensitive, частичное совпадение)
+	- to datetime События, начинающиеся не ранее указанной даты
+	- from datetime События, заканчивающиеся не позднее указанной даты
+	- page int Номер страницы (≥ 1) - gj по умолчанию 1
+	- pageSize int Размер страницы (от 5 до 100) по умолчанию 10
  - GET '/api/events/{id}' - Получить событие по ID. 
  - POST '/api/events' - Создать новое событие.
  - PUT '/api/events/{id}' - Обновить существующее событие.
