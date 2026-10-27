@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using System.Security.Principal;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace EventManager.Infrastructure.Middlewares
 {
@@ -36,11 +34,6 @@ namespace EventManager.Infrastructure.Middlewares
                 httpContext.Request.Path,
                 httpContext.Request.Headers["x-request-id"]);
 
-            //Обеспечьте корректные HTTP-статусы для разных типов ошибок:
-            //400 Bad Request для ошибок валидации;
-            //404 Not Found для ситуаций, когда ресурс не найден;
-            //500 Internal Server Error для непредвиденных ошибок.
-
             if (httpContext.Response.HasStarted)
             {
                 return;
@@ -54,7 +47,7 @@ namespace EventManager.Infrastructure.Middlewares
             var error = new ProblemDetails
             {
                 Status = statusCode,
-                Detail = ex.Message
+                Detail = statusCode == StatusCodes.Status500InternalServerError ? "" : ex.Message
             };
             await httpContext.Response.WriteAsJsonAsync(error);
         }

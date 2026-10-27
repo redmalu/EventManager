@@ -33,7 +33,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
-app.UseExceptionHandler();
+
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");
 app.UseAuthorization();

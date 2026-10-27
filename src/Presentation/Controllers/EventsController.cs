@@ -12,6 +12,15 @@ namespace EventManager.Presentation.Controllers
         private readonly IEventService _eventService;
         private readonly ILogger<EventsController> _logger;
 
+        private ObjectResult GetProblem400(string message) => Problem(
+                detail: message,
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "Некорректная валидация входных данных");
+        private ObjectResult GetProblem404(int id) => Problem(
+                                detail: $"Событие с ID = {id} не найдено",
+                                statusCode: StatusCodes.Status404NotFound,
+                                title: "Событие не найдено");
+        
         public EventsController(IEventService eventService, ILogger<EventsController> logger)
         {
             _eventService = eventService;
@@ -19,25 +28,23 @@ namespace EventManager.Presentation.Controllers
         }
 
         [HttpGet]
-        public ActionResult<PaginatedResult<Event>> GetAll(string? title, DateTime? from, DateTime? to, int? page = 1, int? pageSize = 10)
+        public ActionResult<PaginatedResult<Event>> GetAll(string? title, DateTime? from, DateTime? to, int page = 1, int pageSize = 10)
         {
             if (page < 1)
-                return BadRequest("Номер страницы не должен быть меньше 1");
+                return GetProblem400("Номер страницы не должен быть меньше 1");
             else if ((pageSize < 5 || pageSize > 100))
-                return BadRequest("Размер страницы не должен быть меньше 5 и больше 100");
-            
-            return Ok(_eventService.GetAllEvents(page!.Value, pageSize!.Value, title, from, to));
+                return GetProblem400("Размер страницы не должен быть меньше 5 и больше 100");
+
+            return Ok(_eventService.GetAllEvents(page, pageSize, title, from, to));
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Event> Get(int id) 
+        public ActionResult<Event> Get(int id)
         {
             var _event = _eventService.GetEvent(id);
-            if (_event == null)
-                return NotFound($"Событие с ID = {id} не найдено");
-            return Ok(_event);    
+            return _event == null ? GetProblem404(id) : Ok(_event);
         }
-        
+
         [HttpPost]
         public IActionResult Post(EventDTO eventDTO) 
         {
@@ -49,7 +56,7 @@ namespace EventManager.Presentation.Controllers
         public IActionResult Put(int id, EventDTO eventDTO) 
         {
             var result = _eventService.TryUpdateEvent(id, eventDTO);
-            return result ? NoContent() : NotFound($"Событие с ID = {id} не найдено");
+            return result ? NoContent() : GetProblem404(id);
         }
 
         
@@ -57,7 +64,7 @@ namespace EventManager.Presentation.Controllers
         public IActionResult Delete(int id) 
         {
             var result = _eventService.TryDeleteEvent(id);
-            return result ? NoContent() : NotFound($"Событие с ID = {id} не найдено");
+            return result ? NoContent() : GetProblem404(id);
         }
         
     }
