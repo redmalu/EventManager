@@ -1,4 +1,6 @@
 <Solution>
-  <Project Path="../TestEventManager/TestEventManager.csproj" />
-  <Project Path="EventManager.csproj" />
+  <Project Path="src/EventManager.csproj" />
+  <Project Path="tests/TestEventManager/TestEventManager.csproj">
+    <BuildDependency Project="src/EventManager.csproj" />
+  </Project>
 </Solution>

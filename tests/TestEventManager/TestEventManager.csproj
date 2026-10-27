@@ -16,7 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EventManager\EventManager.csproj" />
+    <Reference Include="EventManager">
+      <HintPath>..\..\src\bin\Debug\net10.0\EventManager.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

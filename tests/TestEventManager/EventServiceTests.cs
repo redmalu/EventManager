@@ -2,7 +2,6 @@
 using EventManager.Data;
 using EventManager.Models;
 using EventManager.Models.DTO;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Moq;
 
 namespace TestEventManager
