@@ -2,6 +2,7 @@
 using EventManager.Data;
 using EventManager.Models;
 using EventManager.Models.DTO;
+using FluentAssertions;
 using Moq;
 
 namespace TestEventManager
@@ -14,19 +15,18 @@ namespace TestEventManager
         {
             int pageSize = 10;
             int page = 1;
-            int expectedTotalCount = 0;
             var mockRepository = new Mock<IEventRepository>();
-            var emptyList = new List<Event>();
-            mockRepository.Setup(repo => repo.GetAll()).Returns(emptyList);
+
+            mockRepository.Setup(repo => repo.GetAll()).Returns(new List<Event>());
             var eventService = new EventService(mockRepository.Object);
 
             var result = eventService.GetAllEvents(page, pageSize);
-            
-            Assert.Equal(emptyList, result.Items);
-            Assert.Equal(expectedTotalCount, result.TotalCount);
-            Assert.Equal(pageSize, result.PageSize);
-            Assert.Equal(0, result.TotalPages);
-            Assert.NotNull(result);
+
+            result.Should().NotBeNull();
+            result.Items.Should().BeEmpty();
+            result.TotalCount.Should().Be(0);
+            result.PageSize.Should().Be(pageSize);
+            result.TotalPages.Should().Be(0);
         }
 
         [Fact]
@@ -45,10 +45,11 @@ namespace TestEventManager
 
             var result = eventService.GetAllEvents(page, pageSize);
             
-            Assert.Equal(2, result.Items.Count);
-            Assert.Equal("Мероприятие 1", result.Items.First().Title);
-            Assert.Equal(1, result.TotalPages);
-            Assert.Equal(page, result.Page);
+            result.Should().NotBeNull();
+            result.Items.Should().HaveCount(2);
+            result.Items.First().Title.Should().Be("Мероприятие 1");
+            result.TotalPages.Should().Be(1);
+            result.Page.Should().Be(page);
         }    
 
         [Fact]
@@ -69,9 +70,10 @@ namespace TestEventManager
 
             var result = eventService.GetAllEvents(page, pageSize, title: title);
 
-            Assert.Equal(2, result.Items.Count);
-            Assert.Contains(title, result.Items.First().Title.ToLower());
-            Assert.Contains(title, result.Items.Last().Title.ToLower());
+            result.Should().NotBeNull();
+            result.Items.Should().HaveCount(2);
+            result.Items.Should().AllSatisfy(e =>
+                e.Title.ToLower().Should().Contain(title));
         }
 
         [Fact]
@@ -92,9 +94,10 @@ namespace TestEventManager
 
             var result = eventService.GetAllEvents(page, pageSize, from: from);
 
-            Assert.Equal(2, result.Items.Count);
-            Assert.True( from < result.Items.First().StartAt);
-            Assert.True( from < result.Items.Last().StartAt);
+            result.Should().NotBeNull();
+            result.Items.Should().HaveCount(2);
+            result.Items.Should().AllSatisfy(e =>
+                e.StartAt.Should().BeAfter(from));
         }
 
         [Fact]
@@ -115,9 +118,10 @@ namespace TestEventManager
 
             var result = eventService.GetAllEvents(page, pageSize, to: to);
 
-            Assert.Equal(2, result.Items.Count);
-            Assert.True(to >= result.Items.First().EndAt);
-            Assert.True(to >= result.Items.Last().EndAt);
+            result.Should().NotBeNull();
+            result.Items.Should().HaveCount(2);
+            result.Items.Should().AllSatisfy(e =>
+                e.EndAt.Should().BeOnOrBefore(to));
         }
 
         [Fact]
@@ -140,11 +144,13 @@ namespace TestEventManager
 
             var result = eventService.GetAllEvents(page, pageSize, from: from, to: to);
 
-            Assert.Equal(1, result.Items.Count);
+            result.Should().NotBeNull();
+            result.Items.Should().HaveCount(1);
+
             var resultEvent = result.Items.First();
-            Assert.True(from <= resultEvent.StartAt);
-            Assert.True(to >= resultEvent.EndAt);
-            Assert.Contains(title, resultEvent.Title.ToLower());
+            resultEvent.StartAt.Should().BeOnOrAfter(from);
+            resultEvent.EndAt.Should().BeOnOrBefore(to);
+            resultEvent.Title.ToLower().Should().Contain(title);
         }
 
         [Fact]
@@ -162,9 +168,9 @@ namespace TestEventManager
 
             var result = eventService.GetEvent(expectedId);
 
-            Assert.NotNull(result);
-            Assert.Equal(expectedId, result.Id);
-            Assert.Equal("Мероприятие 1", result.Title);
+            result.Should().NotBeNull();
+            result.Id.Should().Be(expectedId);
+            result.Title.Should().Be("Мероприятие 1");
         }
 
         [Fact]
@@ -182,7 +188,7 @@ namespace TestEventManager
 
             var result = eventService.GetEvent(expectedId);
 
-            Assert.Null(result);
+            result.Should().BeNull();
         }
 
         [Fact]
@@ -205,12 +211,10 @@ namespace TestEventManager
 
             var result = eventService.CreateEvent(eventDTO);
 
-            Assert.NotNull(result);
-            Assert.Equal(expectedId, result.Id);
-            Assert.Equal(expectedTitle, result.Title);
+            result.Should().NotBeNull();
+            result.Id.Should().Be(expectedId);
+            result.Title.Should().Be(expectedTitle);
         }
-
-       
 
         [Fact]
         [Trait("Category", "UpdateEvent")]
@@ -229,9 +233,9 @@ namespace TestEventManager
 
             var result = eventService.TryUpdateEvent(updateId, updateEventDTO);
             var resultEvent = eventService.GetEvent(updateId);
-            Assert.True(result);
-            Assert.NotNull(resultEvent);
-            Assert.Equal("БМК", resultEvent.Title);
+            result.Should().BeTrue();
+            resultEvent.Should().NotBeNull();
+            resultEvent.Title.Should().Be("БМК");
         }
 
         [Fact]
@@ -250,7 +254,7 @@ namespace TestEventManager
             var eventService = new EventService(mockRepository.Object);
 
             var result = eventService.TryUpdateEvent(updateId, updateEventDTO);
-            Assert.False(result);
+            result.Should().BeFalse();
         }
 
         [Fact]
@@ -271,8 +275,8 @@ namespace TestEventManager
             var result = eventService.TryDeleteEvent(deletedId);
 
             var resultEvent = eventService.GetEvent(deletedId);
-            Assert.True(result);
-            Assert.Null(resultEvent);
+            result.Should().BeTrue();
+            resultEvent.Should().BeNull();
         }
 
         [Fact]
@@ -291,7 +295,7 @@ namespace TestEventManager
 
             var result = eventService.TryDeleteEvent(deletedId);
 
-            Assert.False(result);
+            result.Should().BeFalse();
         }
     }
 }
