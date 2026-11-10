@@ -13,6 +13,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IEventRepository, MemoryEventRepository>();
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IBookingRepository, MemoryBookingRepository>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy => // Первым аргументом указывается название политики

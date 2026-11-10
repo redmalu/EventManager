@@ -16,7 +16,7 @@ namespace EventManager.Presentation.Controllers
                 detail: message,
                 statusCode: StatusCodes.Status400BadRequest,
                 title: "Некорректная валидация входных данных");
-        private ObjectResult GetProblem404(int id) => Problem(
+        private ObjectResult GetProblem404(Guid id) => Problem(
                                 detail: $"Событие с ID = {id} не найдено",
                                 statusCode: StatusCodes.Status404NotFound,
                                 title: "Событие не найдено");
@@ -39,7 +39,7 @@ namespace EventManager.Presentation.Controllers
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Event> Get(int id)
+        public ActionResult<Event> Get(Guid id)
         {
             var _event = _eventService.GetEvent(id);
             return _event == null ? GetProblem404(id) : Ok(_event);
@@ -53,7 +53,7 @@ namespace EventManager.Presentation.Controllers
         }
         
         [HttpPut("{id}")]
-        public IActionResult Put(int id, EventDTO eventDTO) 
+        public IActionResult Put(Guid id, EventDTO eventDTO) 
         {
             var result = _eventService.TryUpdateEvent(id, eventDTO);
             return result ? NoContent() : GetProblem404(id);
@@ -61,7 +61,7 @@ namespace EventManager.Presentation.Controllers
 
         
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id) 
+        public IActionResult Delete(Guid id) 
         {
             var result = _eventService.TryDeleteEvent(id);
             return result ? NoContent() : GetProblem404(id);
