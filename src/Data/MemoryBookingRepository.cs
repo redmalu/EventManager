@@ -6,7 +6,7 @@ namespace EventManager.Data
 {
     public class MemoryBookingRepository : IBookingRepository
     {
-        private ConcurrentDictionary<Guid, Booking> _list = new();
+        private static ConcurrentDictionary<Guid, Booking> _list = new();
 
         public Booking? Get(Guid id)
         {
@@ -17,6 +17,8 @@ namespace EventManager.Data
             return _list.Values.Where(a => a.EventId == eventId).OrderBy(a => a.CreatedAt).ToList();
         }
 
+        
+
         public bool Add(Booking booking)
         {
             return _list.TryAdd(booking.Id, booking);
@@ -24,18 +26,24 @@ namespace EventManager.Data
 
         public bool Delete(Booking booking)
         {
-            return _list.TryRemove(booking.Id, out Booking curBooking);
+            return _list.TryRemove(booking.Id, out Booking? curBooking);
         }
 
         public bool Update(Booking booking)
         {
             return _list.TryUpdate(booking.Id, booking, _list[booking.Id]);
         }
+
+        public List<Booking> GetAll()
+        {
+            return _list.Values.ToList();
+        }
     }
 
     public interface IBookingRepository
     {
         public Booking? Get(Guid id);
+        public List<Booking> GetAll();
         public List<Booking> GetByEventId(Guid eventId);
         public bool Add(Booking booking);
         public bool Update(Booking booking);

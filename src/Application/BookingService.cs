@@ -1,6 +1,7 @@
 ﻿using EventManager.Data;
 using EventManager.Models;
 using EventManager.Models.Enums;
+using Xunit.Sdk;
 
 namespace EventManager.Application
 {
@@ -8,15 +9,24 @@ namespace EventManager.Application
     {
         private readonly ILogger<BookingService> _logger;
         private readonly IBookingRepository _repository;
+        private readonly IEventService _eventService;
 
-        public BookingService(ILogger<BookingService> logger, IBookingRepository repository)
+        public BookingService(ILogger<BookingService> logger, IBookingRepository repository, IEventService eventService)
         {
             _logger = logger;
             _repository = repository;
+            _eventService = eventService;
         }
 
-        public async Task<Guid> CreateBookingAsync(Guid eventId)
+        public async Task<Booking> CreateBookingAsync(Guid eventId, CancellationToken cancellationToken)
         {
+            var @event = _eventService.GetEvent(eventId);
+            if (@event == null) 
+                throw new ArgumentException($"Событие с id = {eventId} не найдено");
+
+            if (cancellationToken.IsCancellationRequested)
+                throw new OperationCanceledException(cancellationToken);
+
             var booking = new Booking
             {
                 Id = Guid.NewGuid(),
@@ -26,10 +36,10 @@ namespace EventManager.Application
             };
             _repository.Add(booking);
 
-            return booking.Id;
+            return booking;
         }
 
-        public async Task<Booking> GetBookingByIdAsync(Guid bookingId)
+        public async Task<Booking?> GetBookingByIdAsync(Guid bookingId, CancellationToken cancellationToken)
         {
             return _repository.Get(bookingId);
         }

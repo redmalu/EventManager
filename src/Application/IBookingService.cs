@@ -5,8 +5,8 @@ namespace EventManager.Application
 {
     public interface IBookingService
     {
-        public Task<Guid> CreateBookingAsync(Guid eventId);
+        public Task<Booking> CreateBookingAsync(Guid eventId, CancellationToken cancellationToken);
 
-        public Task<Booking> GetBookingByIdAsync(Guid bookingId);
+        public Task<Booking?> GetBookingByIdAsync(Guid bookingId, CancellationToken cancellationToken);
     }
 }

@@ -15,6 +15,7 @@ builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IEventRepository, MemoryEventRepository>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IBookingRepository, MemoryBookingRepository>();
+builder.Services.AddHostedService<BookingProccessor>();
 
 builder.Services.AddCors(options =>
 {

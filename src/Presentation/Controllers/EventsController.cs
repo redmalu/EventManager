@@ -7,23 +7,26 @@ namespace EventManager.Presentation.Controllers
 {
     [ApiController]
     [Route("api/events")]
+    
     public class EventsController : ControllerBase
     {
         private readonly IEventService _eventService;
+        private readonly IBookingService _bookingService;
         private readonly ILogger<EventsController> _logger;
 
         private ObjectResult GetProblem400(string message) => Problem(
-                detail: message,
-                statusCode: StatusCodes.Status400BadRequest,
-                title: "Некорректная валидация входных данных");
+                                detail: message,
+                                statusCode: StatusCodes.Status400BadRequest,
+                                title: "Некорректная валидация входных данных");
         private ObjectResult GetProblem404(Guid id) => Problem(
                                 detail: $"Событие с ID = {id} не найдено",
                                 statusCode: StatusCodes.Status404NotFound,
                                 title: "Событие не найдено");
-        
-        public EventsController(IEventService eventService, ILogger<EventsController> logger)
+
+        public EventsController(IEventService eventService, IBookingService bookingService, ILogger<EventsController> logger)
         {
             _eventService = eventService;
+            _bookingService = bookingService;
             _logger = logger;
         }
 
@@ -66,6 +69,30 @@ namespace EventManager.Presentation.Controllers
             var result = _eventService.TryDeleteEvent(id);
             return result ? NoContent() : GetProblem404(id);
         }
-        
+
+        [HttpPost("{id}/book")]
+        public async Task<IActionResult> PostBook(Guid id, CancellationToken cancellationToken)
+        {
+            var result = await _bookingService.CreateBookingAsync(id, cancellationToken);
+           
+            return AcceptedAtAction( nameof(GetBooking), new { id = result.Id }, new CreatedBookingDTO
+            {
+                EventId = result.EventId,
+                Id = result.Id,
+                Status = result.Status.ToString()
+            });
+        }
+
+        [HttpGet("bookings/{id}")]
+        public async Task<IActionResult> GetBooking(Guid id, CancellationToken cancellationToken)
+        {
+            var result = await _bookingService.GetBookingByIdAsync(id, cancellationToken);
+            if(result == null)
+                return Problem(
+                                detail: $"Бронирование с ID = {id} не найдено",
+                                statusCode: StatusCodes.Status404NotFound,
+                                title: "Бронирование не найдено");
+            return Ok(result);
+        }
     }
 }
