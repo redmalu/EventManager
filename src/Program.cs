@@ -1,5 +1,6 @@
 using EventManager.Application;
-using EventManager.Application.Interfaces;
+using EventManager.Application.Services;
+using EventManager.Application.Services.Interfaces;
 using EventManager.Data;
 using EventManager.Infrastructure.Middlewares;
 

@@ -1,7 +1,7 @@
 ﻿using EventManager.Models;
 using EventManager.Models.DTO;
 
-namespace EventManager.Application.Interfaces
+namespace EventManager.Application.Services.Interfaces
 {
     public interface IEventService
     {

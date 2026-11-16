@@ -1,10 +1,10 @@
-﻿using EventManager.Application.Interfaces;
+﻿using EventManager.Application.Services.Interfaces;
 using EventManager.Data;
 using EventManager.Models;
 using EventManager.Models.DTO;
 using System.Collections;
 
-namespace EventManager.Application
+namespace EventManager.Application.Services
 {
     public class EventService : IEventService
     {

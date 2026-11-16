@@ -6,37 +6,35 @@ namespace EventManager.Data
 {
     public class MemoryBookingRepository : IBookingRepository
     {
-        private static ConcurrentDictionary<Guid, Booking> _list = new();
+        private static ConcurrentDictionary<Guid, Booking> _dictionary = new();
 
-        public Booking? Get(Guid id)
-        {
-            return _list.TryGetValue(id, out var booking) ? booking : null;
-        }
-        public List<Booking> GetByEventId(Guid eventId)
-        {
-            return _list.Values.Where(a => a.EventId == eventId).OrderBy(a => a.CreatedAt).ToList();
-        }
+        public Booking? Get(Guid id) => _dictionary.TryGetValue(id, out var booking) ? booking : null;
 
-        
+        public List<Booking> GetAll() => [.. _dictionary.Values];
+
+        public List<Booking> GetByEventId(Guid eventId) =>
+            [.. _dictionary.Values.Where(a => a.EventId == eventId).OrderBy(a => a.CreatedAt)];
+
 
         public bool Add(Booking booking)
         {
-            return _list.TryAdd(booking.Id, booking);
+            ArgumentNullException.ThrowIfNull(booking);
+            return _dictionary.TryAdd(booking.Id, booking);
         }
+        
 
         public bool Delete(Booking booking)
         {
-            return _list.TryRemove(booking.Id, out Booking? curBooking);
+            ArgumentNullException.ThrowIfNull(booking);
+            return _dictionary.TryRemove(booking.Id, out _);
         }
 
         public bool Update(Booking booking)
         {
-            return _list.TryUpdate(booking.Id, booking, _list[booking.Id]);
-        }
+            ArgumentNullException.ThrowIfNull(booking);
 
-        public List<Booking> GetAll()
-        {
-            return _list.Values.ToList();
+            return _dictionary.TryGetValue(booking.Id, out var existing)
+                && _dictionary.TryUpdate(booking.Id, booking, existing);
         }
     }
 

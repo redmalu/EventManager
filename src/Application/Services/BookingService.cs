@@ -1,8 +1,8 @@
-﻿using EventManager.Application.Interfaces;
+﻿using EventManager.Application.Services.Interfaces;
 using EventManager.Data;
 using EventManager.Models;
 
-namespace EventManager.Application
+namespace EventManager.Application.Services
 {
     public class BookingService : IBookingService
     {

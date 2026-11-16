@@ -1,6 +1,6 @@
 ﻿using EventManager.Models;
 
-namespace EventManager.Application.Interfaces
+namespace EventManager.Application.Services.Interfaces
 {
     public interface IBookingService
     {

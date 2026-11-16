@@ -1,4 +1,4 @@
-﻿using EventManager.Application;
+﻿using EventManager.Application.Services;
 using EventManager.Data;
 using EventManager.Models;
 using EventManager.Models.DTO;

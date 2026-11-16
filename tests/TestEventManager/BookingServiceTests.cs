@@ -1,13 +1,10 @@
-﻿using EventManager.Application;
-using EventManager.Application.Interfaces;
+﻿using EventManager.Application.Services;
+using EventManager.Application.Services.Interfaces;
 using EventManager.Data;
 using EventManager.Models;
 using EventManager.Models.Enums;
 using FluentAssertions;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TestEventManager
 {
@@ -28,6 +25,7 @@ namespace TestEventManager
         /// </summary>
         /// <returns></returns>
         [Fact]
+        [Trait("Category", "CreateBookingAsync")]
         public async Task CreateBookingAsync_WhenEventFound_ReturnNewBooking()
         {
             var eventId = Guid.NewGuid();
@@ -54,6 +52,7 @@ namespace TestEventManager
         /// </summary>
         /// <returns></returns>
         [Fact]
+        [Trait("Category", "CreateBookingAsync")]
         public async Task CreateBookingAsync_WhenEventFoundAndCallTwice_ReturnTwoNewBookingForEvent()
         {
             var eventId = Guid.NewGuid();
@@ -90,6 +89,7 @@ namespace TestEventManager
         /// </summary>
         /// <returns></returns>
         [Fact]
+        [Trait("Category", "CreateBookingAsync")]
         public async Task CreateBookingAsync_WhenEventNotFound_ReturnException()
         {
             var eventId = Guid.NewGuid();
@@ -108,6 +108,7 @@ namespace TestEventManager
         /// </summary>
         /// <returns></returns>
         [Fact]
+        [Trait("Category", "GetBookingByIdAsync")]
         public async Task GetBookingByIdAsync_WhenIdExists_ReturnBooking()
         {
             var eventId = Guid.NewGuid();

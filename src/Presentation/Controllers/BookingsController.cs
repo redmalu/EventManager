@@ -1,4 +1,4 @@
-﻿using EventManager.Application.Interfaces;
+﻿using EventManager.Application.Services.Interfaces;
 using EventManager.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,8 +17,8 @@ namespace EventManager.Presentation.Controllers
             _logger = logger;
         }
 
-        [HttpPost("events/{eventid:guid}/book")]
-        public async Task<IActionResult> PostBook(Guid eventId, CancellationToken cancellationToken)
+        [HttpPost("/api/events/{eventid:guid}/booking")]
+        public async Task<IActionResult> PostBooking(Guid eventId, CancellationToken cancellationToken)
         {
             try
             {
