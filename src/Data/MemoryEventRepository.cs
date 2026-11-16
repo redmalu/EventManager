@@ -8,6 +8,7 @@ namespace EventManager.Data
     {
         private static ConcurrentDictionary<Guid,Event> _events = new ConcurrentDictionary<Guid, Event>();
         public ReadOnlyCollection<Event> GetAll() => _events.Values.ToList().AsReadOnly();
+        public Event? GetById(Guid id) => _events.TryGetValue(id, out var e) ? e : null;
         public void Add(Event e) => _events.TryAdd(e.Id, e);
         public void Update(Event e) => _events.TryUpdate(e.Id, e, _events[e.Id]); 
         public bool Remove(Guid id) => _events.Remove(id, out Event? @event);
@@ -17,9 +18,9 @@ namespace EventManager.Data
     public interface IEventRepository
     {
         ReadOnlyCollection<Event> GetAll();
-
+        public Event? GetById(Guid id);
         void Add(Event e);
-
+        void Update(Event e);
         bool Remove(Guid id);
     }
 }

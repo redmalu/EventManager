@@ -178,7 +178,7 @@ namespace TestEventManager
             var expectedId = Id1;
             Dictionary<Guid, Event> list = CreateTestEvents();
             var mockRepository = new Mock<IEventRepository>();
-            mockRepository.Setup(repo => repo.GetAll()).Returns(list.Values.ToList().AsReadOnly());
+            mockRepository.Setup(repo => repo.GetById(It.IsAny<Guid>())).Returns<Guid>(id => list.TryGetValue(id, out var e) ? e : null);
             var eventService = new EventService(mockRepository.Object);
 
             var result = eventService.GetEvent(expectedId);
@@ -234,16 +234,22 @@ namespace TestEventManager
             var updateId = Id2;
             var updateEventDTO = new EventDTO() { Title = "БМК", StartAt = DateTime.Today, EndAt = DateTime.Today.AddMonths(1) };
             Dictionary<Guid, Event> list = CreateTestEvents();
-
-            var mockRepository = new Mock<IEventRepository>();
-            mockRepository.Setup(repo => repo.GetAll()).Returns(list.Values.ToList().AsReadOnly());
-            var eventService = new EventService(mockRepository.Object);
-
+            var repository = MockRepositoryForUpdate(list);
+            var eventService = new EventService(repository.Object);
+            
             var result = eventService.TryUpdateEvent(updateId, updateEventDTO);
             var resultEvent = eventService.GetEvent(updateId);
             result.Should().BeTrue();
             resultEvent.Should().NotBeNull();
             resultEvent.Title.Should().Be("БМК");
+        }
+
+        private static Mock<IEventRepository> MockRepositoryForUpdate(Dictionary<Guid, Event> list)
+        {
+            var mockRepository = new Mock<IEventRepository>();
+            mockRepository.Setup(repo => repo.GetById(It.IsAny<Guid>())).Returns<Guid>(id => list.TryGetValue(id, out var e) ? e : null);
+
+            return mockRepository;
         }
 
         [Fact]
@@ -254,12 +260,19 @@ namespace TestEventManager
             var updateEventDTO = new EventDTO() { Title = "БМК", StartAt = DateTime.Today, EndAt = DateTime.Today.AddMonths(1) };
             Dictionary<Guid, Event> list = CreateTestEvents();
 
-            var mockRepository = new Mock<IEventRepository>();
-            mockRepository.Setup(repo => repo.GetAll()).Returns(list.Values.ToList().AsReadOnly());
-            var eventService = new EventService(mockRepository.Object);
+            var repository = MockRepositoryForUpdate(list);
+            var eventService = new EventService(repository.Object);
 
             var result = eventService.TryUpdateEvent(updateId, updateEventDTO);
             result.Should().BeFalse();
+        }
+
+        private static Mock<IEventRepository> MockRepositoryForDelete(Dictionary<Guid, Event> events)
+        {
+            var mockRepository = new Mock<IEventRepository>();
+            mockRepository.Setup(repo => repo.GetById(It.IsAny<Guid>())).Returns<Guid>(id => events.TryGetValue(id, out var e) ? e : null);
+            mockRepository.Setup(repo => repo.Remove(It.IsAny<Guid>())).Returns<Guid>(id => events.Remove(id));
+            return mockRepository;
         }
 
         [Fact]
@@ -269,7 +282,7 @@ namespace TestEventManager
             var deletedId = Id2;
             Dictionary<Guid, Event> events = CreateTestEvents();
 
-            var mockRepository = CreateMockRepository(events);
+            var mockRepository = MockRepositoryForDelete(events);
             var eventService = new EventService(mockRepository.Object);
 
             var result = eventService.TryDeleteEvent(deletedId);
@@ -285,20 +298,13 @@ namespace TestEventManager
         {
             var deletedId = Id3;
             Dictionary<Guid, Event> events = CreateTestEvents();
-            Mock<IEventRepository> mockRepository = CreateMockRepository(events);
+            Mock<IEventRepository> mockRepository = MockRepositoryForDelete(events);
             var eventService = new EventService(mockRepository.Object);
 
             var result = eventService.TryDeleteEvent(deletedId);
 
             result.Should().BeFalse();
         }
-
-        private static Mock<IEventRepository> CreateMockRepository(Dictionary<Guid, Event> events)
-        {
-            var mockRepository = new Mock<IEventRepository>();
-            mockRepository.Setup(repo => repo.GetAll()).Returns(() => events.Values.ToList().AsReadOnly());
-            mockRepository.Setup(repo => repo.Remove(It.IsAny<Guid>())).Returns<Guid>(id => events.Remove(id));
-            return mockRepository;
-        }
+        
     }
 }

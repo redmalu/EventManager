@@ -1,19 +1,16 @@
-﻿using EventManager.Data;
+﻿using EventManager.Application.Interfaces;
+using EventManager.Data;
 using EventManager.Models;
-using EventManager.Models.Enums;
-using Xunit.Sdk;
 
 namespace EventManager.Application
 {
     public class BookingService : IBookingService
     {
-        private readonly ILogger<BookingService> _logger;
         private readonly IBookingRepository _repository;
         private readonly IEventService _eventService;
 
-        public BookingService(ILogger<BookingService> logger, IBookingRepository repository, IEventService eventService)
+        public BookingService(IBookingRepository repository, IEventService eventService)
         {
-            _logger = logger;
             _repository = repository;
             _eventService = eventService;
         }
@@ -24,16 +21,9 @@ namespace EventManager.Application
             if (@event == null) 
                 throw new ArgumentException($"Событие с id = {eventId} не найдено");
 
-            if (cancellationToken.IsCancellationRequested)
-                throw new OperationCanceledException(cancellationToken);
+            cancellationToken.ThrowIfCancellationRequested();
 
-            var booking = new Booking
-            {
-                Id = Guid.NewGuid(),
-                EventId = eventId,
-                CreatedAt = DateTime.UtcNow,
-                Status = BookingStatus.Pending
-            };
+            var booking = Booking.CreatePending(eventId);
             _repository.Add(booking);
 
             return booking;

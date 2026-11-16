@@ -1,4 +1,5 @@
-﻿using EventManager.Data;
+﻿using EventManager.Application.Interfaces;
+using EventManager.Data;
 using EventManager.Models;
 using EventManager.Models.DTO;
 using System.Collections;
@@ -16,7 +17,7 @@ namespace EventManager.Application
 
         public Event? GetEvent(Guid id)
         {
-            return _repository.GetAll().FirstOrDefault(ev => ev.Id == id); 
+            return _repository.GetById(id); 
         }
 
         public PaginatedResult<Event> GetAllEvents(int page, int pageSize, string? title = null, DateTime? from = null, DateTime? to = null)
@@ -70,6 +71,7 @@ namespace EventManager.Application
             existingEvent.Description = eventDTO.Description;
             existingEvent.StartAt = eventDTO.StartAt;
             existingEvent.EndAt = eventDTO.EndAt;
+            _repository.Update(existingEvent);
             return true;
         }
 

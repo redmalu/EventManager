@@ -1,4 +1,5 @@
 using EventManager.Application;
+using EventManager.Application.Interfaces;
 using EventManager.Data;
 using EventManager.Infrastructure.Middlewares;
 
@@ -15,7 +16,7 @@ builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IEventRepository, MemoryEventRepository>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<IBookingRepository, MemoryBookingRepository>();
-builder.Services.AddHostedService<BookingProccessor>();
+builder.Services.AddHostedService<BookingProcessor>();
 
 builder.Services.AddCors(options =>
 {

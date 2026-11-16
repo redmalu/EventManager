@@ -3,13 +3,15 @@ using EventManager.Models.Enums;
 
 namespace EventManager.Application
 {
-    public class BookingProccessor : BackgroundService
+    public class BookingProcessor : BackgroundService
     {
         private readonly IServiceScopeFactory scopeFactory;
+        private readonly ILogger<BookingProcessor> logger;
 
-        public BookingProccessor(IServiceScopeFactory scopeFactory)
+        public BookingProcessor(IServiceScopeFactory scopeFactory, ILogger<BookingProcessor> logger)
         {
             this.scopeFactory = scopeFactory;
+            this.logger = logger;
         }
 
         protected async override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -23,10 +25,20 @@ namespace EventManager.Application
                 
                 foreach(var booking in pendingBooking)
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(2),stoppingToken);
-                    booking.Status = BookingStatus.Confirmed;
-                    booking.ProcessedAt = DateTime.UtcNow;
-                    bookingRepository.Update(booking);
+                    try
+                    {
+                        await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
+                        booking.Confirm();
+                        bookingRepository.Update(booking);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        throw;
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex, $"Ошибка обработки бронирования {booking.Id}");
+                    }
                 }
 
                 await Task.Delay(TimeSpan.FromSeconds(20), stoppingToken);
