@@ -1,15 +1,15 @@
 ﻿using EventManager.Models;
 using EventManager.Models.DTO;
 
-namespace EventManager.Application
+namespace EventManager.Application.Services.Interfaces
 {
     public interface IEventService
     {
-        public Event? GetEvent(int id);
+        public Event? GetEvent(Guid id);
         public PaginatedResult<Event> GetAllEvents(int page, int pageSize, string? title, DateTime? from, DateTime? to);
         public Event CreateEvent(EventDTO eventDTO);
-        public bool TryUpdateEvent(int id, EventDTO eventDTO);
-        public bool TryDeleteEvent(int id);
+        public bool TryUpdateEvent(Guid id, EventDTO eventDTO);
+        public bool TryDeleteEvent(Guid id);
         
     }
 }
