@@ -1,18 +1,25 @@
 using EventManager.Application;
+using EventManager.Application.Services;
+using EventManager.Application.Services.Interfaces;
 using EventManager.Data;
 using EventManager.Infrastructure.Middlewares;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add( new JsonStringEnumConverter()));
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<IEventRepository, MemoryEventRepository>();
+builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<IBookingRepository, MemoryBookingRepository>();
+builder.Services.AddHostedService<BookingProcessor>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy => // Первым аргументом указывается название политики

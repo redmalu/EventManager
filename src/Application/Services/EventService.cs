@@ -1,9 +1,10 @@
-﻿using EventManager.Data;
+﻿using EventManager.Application.Services.Interfaces;
+using EventManager.Data;
 using EventManager.Models;
 using EventManager.Models.DTO;
 using System.Collections;
 
-namespace EventManager.Application
+namespace EventManager.Application.Services
 {
     public class EventService : IEventService
     {
@@ -14,9 +15,9 @@ namespace EventManager.Application
             
         }
 
-        public Event? GetEvent(int id)
+        public Event? GetEvent(Guid id)
         {
-            return _repository.GetAll().FirstOrDefault(ev => ev.Id == id); 
+            return _repository.GetById(id); 
         }
 
         public PaginatedResult<Event> GetAllEvents(int page, int pageSize, string? title = null, DateTime? from = null, DateTime? to = null)
@@ -48,11 +49,9 @@ namespace EventManager.Application
 
         public Event CreateEvent(EventDTO eventDTO)
         {
-            var _events = _repository.GetAll();
-            var id = _events.Count() > 0 ? _events.Max(a => a.Id) + 1 : 1;
             var createdEvent = new Event()
             {
-                Id = id,
+                Id = Guid.NewGuid(),
                 Title = eventDTO.Title,
                 Description = eventDTO.Description,
                 StartAt = eventDTO.StartAt,
@@ -62,7 +61,7 @@ namespace EventManager.Application
             return createdEvent;
         }
 
-        public bool TryUpdateEvent(int id, EventDTO eventDTO)
+        public bool TryUpdateEvent(Guid id, EventDTO eventDTO)
         {
             var existingEvent = GetEvent(id);
             if (existingEvent == null)
@@ -72,15 +71,16 @@ namespace EventManager.Application
             existingEvent.Description = eventDTO.Description;
             existingEvent.StartAt = eventDTO.StartAt;
             existingEvent.EndAt = eventDTO.EndAt;
+            _repository.Update(existingEvent);
             return true;
         }
 
-        public bool TryDeleteEvent(int id)
+        public bool TryDeleteEvent(Guid id)
         {
             var existingEvent = GetEvent(id);
             if (existingEvent == null)
                 return false;
-            _repository.Remove(existingEvent);
+            _repository.Remove(id);
             return true;
         }
     }
