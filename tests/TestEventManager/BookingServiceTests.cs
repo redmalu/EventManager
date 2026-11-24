@@ -121,6 +121,7 @@ namespace TestEventManager
             result.Should().NotBeNull();
             result.Id.Should().Be(booking.Id);
             result.Status.Should().Be(BookingStatus.Pending);
+            
         }
         //Успешные сценарии:
         //

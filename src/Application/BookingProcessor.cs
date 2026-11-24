@@ -18,29 +18,30 @@ namespace EventManager.Application
         {
             while(!stoppingToken.IsCancellationRequested)
             {
-                var scope = scopeFactory.CreateScope();
-                var bookingRepository = scope.ServiceProvider.GetRequiredService<IBookingRepository>();
-                var allBooking = bookingRepository.GetAll();
-                var pendingBooking = allBooking.Where(a => a.Status == BookingStatus.Pending).ToList();
-                
-                foreach(var booking in pendingBooking)
+                using (var scope = scopeFactory.CreateScope())
                 {
-                    try
+                    var bookingRepository = scope.ServiceProvider.GetRequiredService<IBookingRepository>();
+                    var allBooking = bookingRepository.GetAll();
+                    var pendingBooking = allBooking.Where(a => a.Status == BookingStatus.Pending).ToList();
+
+                    foreach (var booking in pendingBooking)
                     {
-                        await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
-                        booking.Confirm();
-                        bookingRepository.Update(booking);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        throw;
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError(ex, $"Ошибка обработки бронирования {booking.Id}");
+                        try
+                        {
+                            await Task.Delay(TimeSpan.FromSeconds(2), stoppingToken);
+                            booking.Confirm();
+                            bookingRepository.Update(booking);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            throw;
+                        }
+                        catch (Exception ex)
+                        {
+                            logger.LogError(ex, $"Ошибка обработки бронирования {booking.Id}");
+                        }
                     }
                 }
-
                 await Task.Delay(TimeSpan.FromSeconds(20), stoppingToken);
             }
             

@@ -54,7 +54,7 @@ Events
  - DELETE '/api/events/{id}' - Удалить событие по ID.
 
  Bookings
- - POST 'api/events/{eventid}/bookings' - создание бронирования для события
+ - POST 'api/events/{id}/book' - создание бронирования для события
  - GET 'api/bookings/{id}' - получение детальной информации о конкретной брони по её идентификатору
 
 
@@ -90,7 +90,7 @@ Events
 **Response (201 Created):**
 ```json
 {
-  "id": 1,
+  "id": "aaa...111",
   "title": "Конференция по .NET",
   "description": "Ежегодная встреча разработчиков",
   "startAt": "2024-11-15T10:00:00Z",

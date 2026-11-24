@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace EventManager.Presentation.Controllers
 {
     [ApiController]
-    [Route("api/bookings")]
+    [Route("api")]
     public class BookingsController : Controller
     {
         private readonly IBookingService _bookingService;
@@ -17,12 +17,13 @@ namespace EventManager.Presentation.Controllers
             _logger = logger;
         }
 
-        [HttpPost("/api/events/{eventid:guid}/booking")]
-        public async Task<IActionResult> PostBooking(Guid eventId, CancellationToken cancellationToken)
+        [HttpPost("events/{id:guid}/book")]
+        [ProducesResponseType(202)]
+        public async Task<IActionResult> PostBooking(Guid id, CancellationToken cancellationToken)
         {
             try
             {
-                var result = await _bookingService.CreateBookingAsync(eventId, cancellationToken);
+                var result = await _bookingService.CreateBookingAsync(id, cancellationToken);
 
                 return AcceptedAtAction(nameof(GetBooking), new { id = result.Id }, new CreatedBookingDTO
                 {
@@ -33,7 +34,7 @@ namespace EventManager.Presentation.Controllers
             }
             catch (ArgumentException ex)
             {
-                _logger.LogWarning(ex, "Не удалось создать бронь для события {eventId}", eventId);
+                _logger.LogWarning(ex, "Не удалось создать бронь для события {eventId}", id);
                 return Problem(
                     detail: ex.Message,
                     statusCode: StatusCodes.Status404NotFound,
@@ -41,12 +42,12 @@ namespace EventManager.Presentation.Controllers
             }
             catch (OperationCanceledException)
             {
-                _logger.LogInformation($"Создание брони для события {eventId} отменено");
+                _logger.LogInformation($"Создание брони для события {id} отменено");
                 return StatusCode(StatusCodes.Status499ClientClosedRequest);
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("bookings/{id}")]
         public async Task<IActionResult> GetBooking(Guid id, CancellationToken cancellationToken)
         {
             var result = await _bookingService.GetBookingByIdAsync(id, cancellationToken);
