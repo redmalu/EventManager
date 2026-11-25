@@ -12,7 +12,6 @@ namespace EventManager.Application.Services
         public EventService(IEventRepository repository) 
         {
             _repository = repository;
-            
         }
 
         public Event? GetEvent(Guid id)
@@ -49,7 +48,7 @@ namespace EventManager.Application.Services
 
         public Event CreateEvent(EventDTO eventDTO)
         {
-            var createdEvent = new Event()
+            var createdEvent = new Event(eventDTO.TotalSeats)
             {
                 Id = Guid.NewGuid(),
                 Title = eventDTO.Title,
@@ -71,6 +70,7 @@ namespace EventManager.Application.Services
             existingEvent.Description = eventDTO.Description;
             existingEvent.StartAt = eventDTO.StartAt;
             existingEvent.EndAt = eventDTO.EndAt;
+            existingEvent.TotalSeats = eventDTO.TotalSeats;
             _repository.Update(existingEvent);
             return true;
         }

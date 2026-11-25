@@ -29,7 +29,7 @@ namespace TestEventManager
         public async Task CreateBookingAsync_WhenEventFound_ReturnNewBooking()
         {
             var eventId = Guid.NewGuid();
-            var mockEvent = new Event { Id = eventId, Title = "Мероприятие 1", Description = "Концерт", StartAt = new DateTime(2026,12,12), EndAt = new DateTime(2026,12,13)};
+            var mockEvent = CreateMockEvent(eventId);
             _eventServiceMock.Setup( a => a.GetEvent(eventId)).Returns(mockEvent);
             var bookingService = new BookingService(_bookingRepositoryMock.Object, _eventServiceMock.Object);
             var cancellationToken = CancellationToken.None;
@@ -56,13 +56,13 @@ namespace TestEventManager
         public async Task CreateBookingAsync_WhenEventFoundAndCallTwice_ReturnTwoNewBookingForEvent()
         {
             var eventId = Guid.NewGuid();
-            var mockEvent = new Event { Id = eventId, Title = "Мероприятие 1", Description = "Концерт", StartAt = new DateTime(2026, 12, 12), EndAt = new DateTime(2026, 12, 13) };
+            Event mockEvent = CreateMockEvent(eventId);
             _eventServiceMock.Setup(a => a.GetEvent(eventId)).Returns(mockEvent);
             var bookingService = new BookingService(_bookingRepositoryMock.Object, _eventServiceMock.Object);
             var cancellationToken = CancellationToken.None;
             var result1 = await bookingService.CreateBookingAsync(eventId, cancellationToken);
             var result2 = await bookingService.CreateBookingAsync(eventId, cancellationToken);
-             
+
             result1.Should().NotBeNull();
             result1.Id.Should().NotBe(Guid.Empty);
             result1.EventId.Should().Be(eventId);
@@ -82,6 +82,11 @@ namespace TestEventManager
             _bookingRepositoryMock.Verify(
                 x => x.Add(It.Is<Booking>(b => b.EventId == eventId && b.Status == BookingStatus.Pending)),
                 Times.Exactly(2));
+        }
+
+        private static Event CreateMockEvent(Guid eventId)
+        {
+            return new Event(100) { Id = eventId, Title = "Мероприятие 1", Description = "Концерт", StartAt = new DateTime(2026, 12, 12), EndAt = new DateTime(2026, 12, 13) };
         }
 
         /// <summary>

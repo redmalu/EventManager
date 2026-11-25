@@ -11,11 +11,15 @@ namespace EventManager.Models.DTO
         public required DateTime StartAt { get; set; }
         [Required(ErrorMessage = "Дата окончания обязательна для заполнения")]
         public required DateTime EndAt { get; set; }
+        public required int TotalSeats { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
             if (EndAt <= StartAt)
-                yield return new ValidationResult("Дата окончания не должна быть раньше или такой же как дата начала", new[] { nameof(EndAt) }); 
+                yield return new ValidationResult("Дата окончания не должна быть раньше или такой же как дата начала", new[] { nameof(EndAt) });
+
+            if (TotalSeats <= 0)
+                yield return new ValidationResult("Общее количество мест на событие должно быть больше 0", new[] { nameof(TotalSeats) });
         }
     }
 }

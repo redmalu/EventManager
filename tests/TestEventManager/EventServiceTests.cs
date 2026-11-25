@@ -61,8 +61,8 @@ namespace TestEventManager
         {
             return new()
             {
-                [Id1] = new Event { Id = Id1, Title = "Мероприятие 1", StartAt = new DateTime(2026,11,25), EndAt = new DateTime(2027,01,25) },
-                [Id2] = new Event { Id = Id2, Title = "Мероприятие 2", StartAt = new DateTime(2026,10,15), EndAt = new DateTime(2026,12,15) }
+                [Id1] = new Event(20) { Id = Id1, Title = "Мероприятие 1", StartAt = new DateTime(2026,11,25), EndAt = new DateTime(2027,01,25) },
+                [Id2] = new Event(30) { Id = Id2, Title = "Мероприятие 2", StartAt = new DateTime(2026,10,15), EndAt = new DateTime(2026,12,15) }
             };
         }
 
@@ -74,12 +74,7 @@ namespace TestEventManager
             int pageSize = 10;
             int page = 1;
             var mockRepository = new Mock<IEventRepository>();
-            Dictionary<Guid, Event> list = new()
-            {
-                [Id1] = new Event { Id = Id1, Title = "Мероприятие 1", StartAt = new DateTime(2026, 12, 01), EndAt = new DateTime(2026, 12, 02) },
-                [Id2] = new Event { Id = Id2, Title = "Мероприятие 2", StartAt = DateTime.Today, EndAt = DateTime.Today.AddMonths(1) },
-                [Id3] = new Event { Id = Id3, Title = "Конференция IT", StartAt = DateTime.Today, EndAt = DateTime.Today.AddMonths(1) }
-            };
+            Dictionary<Guid, Event> list = Create3MockEvents();
             mockRepository.Setup(repo => repo.GetAll()).Returns(list.Values.ToList().AsReadOnly());
             var eventService = new EventService(mockRepository.Object);
 
@@ -99,12 +94,7 @@ namespace TestEventManager
             int pageSize = 10;
             int page = 1;
             var mockRepository = new Mock<IEventRepository>();
-            Dictionary<Guid, Event> list = new()
-            {
-                [Id1] = new Event { Id = Id1, Title = "Мероприятие 1", StartAt = new DateTime(2026, 12, 01), EndAt = new DateTime(2026, 12, 02) },
-                [Id2] = new Event { Id = Id2, Title = "Мероприятие 2", StartAt = new DateTime(2026, 12, 10), EndAt = new DateTime(2026, 12, 22) },
-                [Id3] = new Event { Id = Id3, Title = "Конференция IT", StartAt = new DateTime(2027, 12, 01), EndAt = new DateTime(2027, 12, 02) }
-            };
+            Dictionary<Guid, Event> list = Create3MockEvents();
             mockRepository.Setup(repo => repo.GetAll()).Returns(list.Values.ToList().AsReadOnly());
             var eventService = new EventService(mockRepository.Object);
 
@@ -116,6 +106,16 @@ namespace TestEventManager
                 e.StartAt.Should().BeAfter(from));
         }
 
+        private static Dictionary<Guid, Event> Create3MockEvents()
+        {
+            return new()
+            {
+                [Id1] = new Event(20) { Id = Id1, Title = "Мероприятие 1", StartAt = new DateTime(2026, 12, 01), EndAt = new DateTime(2026, 12, 02) },
+                [Id2] = new Event(30) { Id = Id2, Title = "Мероприятие 2", StartAt = new DateTime(2026, 12, 10), EndAt = new DateTime(2026, 12, 22) },
+                [Id3] = new Event(50) { Id = Id3, Title = "Конференция IT", StartAt = new DateTime(2027, 12, 01), EndAt = new DateTime(2027, 12, 02) }
+            };
+        }
+
         [Fact]
         [Trait("Category", "GetAll")]
         public void GetAllEvents_FilteredByEndAt_ReturnsEvents()
@@ -124,12 +124,7 @@ namespace TestEventManager
             int pageSize = 10;
             int page = 1;
             var mockRepository = new Mock<IEventRepository>();
-            Dictionary<Guid, Event> list = new()
-            {
-                [Id1] = new Event { Id = Id1, Title = "Мероприятие 1", StartAt = new DateTime(2026, 12, 01), EndAt = new DateTime(2026, 12, 02) },
-                [Id2] = new Event { Id = Id2, Title = "Мероприятие 2", StartAt = new DateTime(2026, 12, 10), EndAt = new DateTime(2026, 12, 22) },
-                [Id3] = new Event { Id = Id3, Title = "Конференция IT", StartAt = new DateTime(2027, 12, 01), EndAt = new DateTime(2027, 12, 02) }
-            };
+            Dictionary<Guid, Event> list = Create3MockEvents();
             mockRepository.Setup(repo => repo.GetAll()).Returns(list.Values.ToList().AsReadOnly());
             var eventService = new EventService(mockRepository.Object);
 
@@ -151,12 +146,7 @@ namespace TestEventManager
             int pageSize = 10;
             int page = 1;
             var mockRepository = new Mock<IEventRepository>();
-            Dictionary<Guid, Event> list = new()
-            {
-                [Id1] = new Event { Id = Id1, Title = "Мероприятие 1", StartAt = new DateTime(2026, 12, 01), EndAt = new DateTime(2026, 12, 02) },
-                [Id2] = new Event { Id = Id2, Title = "Мероприятие 2", StartAt = new DateTime(2026, 12, 10), EndAt = new DateTime(2026, 12, 22) },
-                [Id3] = new Event { Id = Id3, Title = "Конференция IT", StartAt = new DateTime(2027, 12, 01), EndAt = new DateTime(2027, 12, 02) }
-            };
+            Dictionary<Guid, Event> list = Create3MockEvents();
             mockRepository.Setup(repo => repo.GetAll()).Returns(list.Values.ToList().AsReadOnly());
             var eventService = new EventService(mockRepository.Object);
 
@@ -213,7 +203,8 @@ namespace TestEventManager
                 Title = expectedTitle,
                 Description = "Большая конфа",
                 StartAt = new DateTime(2026, 11, 01),
-                EndAt = new DateTime(2026, 12, 01)
+                EndAt = new DateTime(2026, 12, 01),
+                TotalSeats = 100
             };
 
             var mockRepository = new Mock<IEventRepository>();
@@ -232,7 +223,7 @@ namespace TestEventManager
         public void TryUpdateEvent_WhenIdExists_ReturnTrue()
         {
             var updateId = Id2;
-            var updateEventDTO = new EventDTO() { Title = "БМК", StartAt = DateTime.Today, EndAt = DateTime.Today.AddMonths(1) };
+            var updateEventDTO = new EventDTO() { Title = "БМК", StartAt = DateTime.Today, EndAt = DateTime.Today.AddMonths(1), TotalSeats = 100 };
             Dictionary<Guid, Event> list = CreateTestEvents();
             var repository = MockRepositoryForUpdate(list);
             var eventService = new EventService(repository.Object);
@@ -257,7 +248,7 @@ namespace TestEventManager
         public void TryUpdateEvent_WhenIdNotExists_ReturnFalse()
         {
             var updateId = Id3;
-            var updateEventDTO = new EventDTO() { Title = "БМК", StartAt = DateTime.Today, EndAt = DateTime.Today.AddMonths(1) };
+            var updateEventDTO = new EventDTO() { Title = "БМК", StartAt = DateTime.Today, EndAt = DateTime.Today.AddMonths(1), TotalSeats = 100 };
             Dictionary<Guid, Event> list = CreateTestEvents();
 
             var repository = MockRepositoryForUpdate(list);
